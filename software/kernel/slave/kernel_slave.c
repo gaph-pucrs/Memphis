@@ -497,8 +497,10 @@ int Syscall(unsigned int service, unsigned int arg0, unsigned int arg1, unsigned
 				if(MemoryRead(DMNI_SEND_ACTIVE))
 					return 0;
 				
-				/* DATA_AV is processed, erase it */
-				data_av_pop(&(current->data_av));
+				if(arg2){
+					/* DATA_AV is processed, erase it */
+					data_av_pop(&(current->data_av));
+				}
 
 				send_message_request(producer_task, consumer_task, producer_PE, net_address, 0);
 			}
