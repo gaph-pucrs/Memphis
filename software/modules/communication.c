@@ -89,7 +89,7 @@ int add_PIPE(int producer_task, int consumer_task, Message * msg){
 
 	pipe_ptr->order = last_order + 1;
 
-	for (int i=0; i<msg->length; i++){
+	for (volatile int i=0; i<msg->length; i++){
 		pipe_ptr->message.msg[i] = msg->msg[i];
 	}
 
