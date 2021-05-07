@@ -3,8 +3,7 @@ import sys
 import math
 import os
 import commands
-import Tkinter as tkinter
-import tkMessageBox as mbox
+import multiprocessing
 from yaml_intf import *
 from build_utils import *
 
@@ -65,9 +64,9 @@ def main():
     
     #Copies the app make from MEMPHIS_PATH to the application folder
     copy_app_make(MEMPHIS_PATH, APP_PATH, page_size_KB)
-    
+    NCPU = multiprocessing.cpu_count()
     #Compiles the application
-    exit_status = os.system("cd "+APP_PATH+"; make")
+    exit_status = os.system("cd "+APP_PATH+"; make "+"-j"+str(NCPU))
 
     if exit_status != 0:
         sys.exit("\nError compiling applications' source code\n");
@@ -296,8 +295,7 @@ def check_application_task_number(testcase_dir, app_task_number, app_name):
         sys.exit("ERROR in app_builder: impossible to determine the max number of application task\n")
     
     if app_task_number > kernel_max_app:
-        tkinter.Tk().wm_withdraw()
-        mbox.showinfo('ERROR', "Applicaiton: "+app_name+" has "+str(app_task_number)+" tasks but kernel support MAX_TASKS_APP of "+str(kernel_max_app)+". Please change this kernel constraint inside the file build_env/scripts/kernel_builder.py")
+        print "ERROR: Application "+app_name+" has "+str(app_task_number)+" tasks but kernel support MAX_TASKS_APP of "+str(kernel_max_app)+". Please change this kernel constraint inside the file build_env/scripts/kernel_builder.py"
         sys.exit("\nMAX_TASKS_APP boundary exceeded\n")
 
 main()
