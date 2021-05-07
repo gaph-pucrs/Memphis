@@ -101,7 +101,7 @@ void pe::reset_n_attr(){
 void pe::sequential_attr(){
 
 	FILE *fp;
-	char c, end;
+	char end;
 
 	if (reset.read() == 1) {
 		cpu_mem_address_reg.write(0);
