@@ -360,7 +360,7 @@ int Syscall(unsigned int service, unsigned int arg0, unsigned int arg1, unsigned
 					msg_write_pipe.length = msg_read->length;
 
 					//Avoids message overwriting by the producer task
-					for (int i=0; i < msg_read->length; i++)
+					for (volatile int i=0; i < msg_read->length; i++)
 						msg_write_pipe.msg[i] = msg_read->msg[i];
 
 					send_message_delivery(producer_task, consumer_task, msg_req_ptr->requester_proc, &msg_write_pipe);
@@ -419,7 +419,7 @@ int Syscall(unsigned int service, unsigned int arg0, unsigned int arg1, unsigned
 
 					msg_write->length = pipe_ptr->message.length;
 
-					for (int i = 0; i<msg_write->length; i++) {
+					for (volatile int i = 0; i<msg_write->length; i++) {
 						msg_write->msg[i] = pipe_ptr->message.msg[i];
 					}
 
@@ -550,7 +550,7 @@ void printTaskInformations(TCB *task_tcb, char text, char bss_data, char stack){
 
 	if (text){
 		puts("\nTEXT\n");
-		offset = task_tcb->offset;
+		offset = (unsigned int *)(task_tcb->offset);
 		for(i=0; i<task_tcb->text_lenght; i++){
 			puts(itoh(offset[i])); puts("\n");
 		}
@@ -558,7 +558,7 @@ void printTaskInformations(TCB *task_tcb, char text, char bss_data, char stack){
 
 	if (bss_data){
 		puts("\nBSS E DATA\n");
-		offset = (task_tcb->offset + (task_tcb->text_lenght*4));
+		offset = (unsigned int*)(task_tcb->offset + (task_tcb->text_lenght*4));
 		for(i=0; i<task_tcb->bss_lenght + task_tcb->data_lenght; i++){
 			puts(itoh(offset[i])); puts("\n");
 		}
@@ -566,7 +566,7 @@ void printTaskInformations(TCB *task_tcb, char text, char bss_data, char stack){
 
 	if (stack) {
 		puts("\nSTACK\n");
-		offset = task_tcb->offset + task_tcb->reg[25];
+		offset = (unsigned int*)(task_tcb->offset + task_tcb->reg[25]);
 		for(i=0; i<stack_lenght; i++){
 			puts(itoh(offset[i])); puts("\n");
 		}
