@@ -307,7 +307,7 @@ void AddRoundKey(BYTE state[][4], const WORD w[])
 #endif
 	BYTE subkey[4];
 
-	// memcpy(subkey,&w[idx],4); // Not accurate for big endian machines
+	// __builtin_memcpy(subkey,&w[idx],4); // Not accurate for big endian machines
 	// Subkey 1
 	subkey[0] = (w[0] >> 24) & 0xFF;
 	subkey[1] = (w[0] >> 16) & 0xFF;
