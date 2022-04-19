@@ -100,7 +100,7 @@ void clear_scheduling(Scheduling * scheduling_tcb){
  *  \param input_task Scheduling structure of the task to be updated
  *  \param current_time Current system time
  */
-void inline update_slack_time(Scheduling * input_task, unsigned int current_time){
+void update_slack_time(Scheduling * input_task, unsigned int current_time){
 
 	int relative_deadline, time_until_deadline;
 
@@ -194,7 +194,7 @@ unsigned int round_robin(){
  * \param scheduled Scheduled task pointer
  * \param time Current system time
  */
-void inline dynamic_slice_time(Scheduling *scheduled, unsigned int time){
+void dynamic_slice_time(Scheduling *scheduled, unsigned int time){
 
 	Scheduling * task;
 	unsigned int closer_period, second_LST, end_period;
@@ -238,7 +238,7 @@ void inline dynamic_slice_time(Scheduling *scheduled, unsigned int time){
  * status, slack-time
  *  \param current_time Current system time
  */
-void inline update_real_time(unsigned int current_time){
+void update_real_time(unsigned int current_time){
 
 	Scheduling * task;
 

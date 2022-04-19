@@ -44,7 +44,20 @@ unsigned char add_pending_service(ServiceHeader * pending_service){
 	fifo_free_position = &pending_services_FIFO[pending_service_last];
 
 	//equivalent to a memcopy once both are the same struct
-	*fifo_free_position = *pending_service;
+	/* Copy manually to avoid generating a memcpy */
+	fifo_free_position->header = pending_service->header;
+	fifo_free_position->payload_size = pending_service->payload_size;
+	fifo_free_position->service = pending_service->service;
+	fifo_free_position->producer_task = pending_service->producer_task;
+	fifo_free_position->consumer_task = pending_service->consumer_task;
+	fifo_free_position->source_PE = pending_service->source_PE;
+	fifo_free_position->timestamp = pending_service->timestamp;
+	fifo_free_position->transaction = pending_service->transaction;
+	fifo_free_position->msg_lenght = pending_service->msg_lenght;
+	fifo_free_position->pkt_size = pending_service->pkt_size;
+	fifo_free_position->code_size = pending_service->code_size;
+	fifo_free_position->bss_size = pending_service->bss_size;
+	fifo_free_position->initial_address = pending_service->initial_address;
 
 	if (pending_service_last == PENDING_SERVICE_TAM-1){
 		pending_service_last = 0;

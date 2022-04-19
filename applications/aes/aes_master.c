@@ -85,7 +85,7 @@ int main()
 		aux_msg[2] = x+1;
 		if(x >= NUMBER_OF_SLAVES) // zero messages to Slave not used
 			aux_msg[0] = END_TASK;
-		memcpy(&msg.msg, &aux_msg, 4*msg.length);
+		__builtin_memcpy(&msg.msg, &aux_msg, 4*msg.length);
 		Send(&msg, Slave[x]);  
 	}
 
@@ -96,7 +96,7 @@ int main()
 		for(y = 0; y < NUMBER_OF_SLAVES; y++){
 			if(qtd_messages[(x+y) % NUMBER_OF_SLAVES] != 0){
 				msg.length = 4*AES_BLOCK_SIZE;
-				memcpy(msg.msg, &plain_msg[(x+y)*AES_BLOCK_SIZE], 4*AES_BLOCK_SIZE);
+				__builtin_memcpy(msg.msg, &plain_msg[(x+y)*AES_BLOCK_SIZE], 4*AES_BLOCK_SIZE);
 				Send(&msg, Slave[(x+y) % NUMBER_OF_SLAVES]);
 			}
 		}
@@ -140,7 +140,7 @@ int main()
 		msg.length = sizeof(aux_msg);
 		aux_msg[0] = DECIPHER_MODE;
 		aux_msg[1] = qtd_messages[x];
-		memcpy(&msg.msg, &aux_msg, 4*msg.length);
+		__builtin_memcpy(&msg.msg, &aux_msg, 4*msg.length);
 		Send(&msg, Slave[x]);  
 	}
 
@@ -151,7 +151,7 @@ int main()
 		for(y = 0; y < NUMBER_OF_SLAVES; y++){
 			if(qtd_messages[(x+y) % NUMBER_OF_SLAVES] != 0){
 				msg.length = 4*AES_BLOCK_SIZE;
-				memcpy(msg.msg, &cipher_msg[(x+y)*AES_BLOCK_SIZE], 4*AES_BLOCK_SIZE);
+				__builtin_memcpy(msg.msg, &cipher_msg[(x+y)*AES_BLOCK_SIZE], 4*AES_BLOCK_SIZE);
 				Send(&msg, Slave[(x+y) % NUMBER_OF_SLAVES]);   
 			} 
 		}
@@ -182,7 +182,7 @@ int main()
 		msg.length = sizeof(aux_msg);
 		aux_msg[0] = END_TASK;
 		aux_msg[1] = 0;
-		memcpy(&msg.msg, &aux_msg, 4*msg.length);
+		__builtin_memcpy(&msg.msg, &aux_msg, 4*msg.length);
 		Send(&msg, Slave[x]);  
 	}	
     Echo("task AES finished.");
