@@ -19,6 +19,7 @@
 #include "../../include/kernel_pkg.h"
 #include "../include/plasma.h"
 #include "../include/services.h"
+#include "task_control.h"
 #include "packet.h"
 #include "utils.h"
 
@@ -28,9 +29,9 @@ unsigned int time_slice;					//!<Time slice used to configure the processor to g
 unsigned int schedule_overhead = 500;		//!<Used to dynamically estimate the scheduler overhead
 unsigned int instant_overhead;				//!<Used to dynamically estimate the scheduler overhead
 unsigned int cpu_utilization = 0;			//!<RT CPU utilization, only filled with RT constraints
+extern unsigned int cluster_master_address;
 
-
-/*void send_deadline_miss_report(Scheduling * real_time_task){
+void send_deadline_miss_report(Scheduling * real_time_task){
 
 	ServiceHeader * p;
 	TCB * tcb_ptr;
@@ -46,7 +47,7 @@ unsigned int cpu_utilization = 0;			//!<RT CPU utilization, only filled with RT 
 	p->task_ID = tcb_ptr->id;
 
 	send_packet(p, 0, 0);
-}*/
+}
 
 
 /**Get the time slice. Useful to provide the kernel slave time slice
@@ -147,7 +148,8 @@ void real_time_task(Scheduling * real_time_task, unsigned int period, int deadli
 
 		real_time_task->ready_time = ready_time;
 
-		real_time_task->status = READY;
+		if(real_time_task->status != MIGRATING)
+			real_time_task->status = READY;
 
 		real_time_task->remaining_exec_time = execution_time;
 
@@ -280,9 +282,6 @@ void update_real_time(unsigned int current_time){
 				task->status = READY;
 			}
 
-			//Check deadline miss
-			if (task->waiting_msg == 0 && task->slack_time == 0 && task->remaining_exec_time > (task->execution_time/10))
-				puts("#### -------->>>  Deadline miss\n");
 			//putsv("Remaining = ", task->remaining_exec_time);
 		}
 
@@ -305,6 +304,22 @@ void update_real_time(unsigned int current_time){
 		//For all real-time task that are not SLEEPING, the slack time must be updated at each scheduler call
 		if (task->status != SLEEPING){
 			update_slack_time(task, current_time);
+		}
+	}
+
+	static unsigned last_check = 0;
+	unsigned now = MemoryRead(TICK_COUNTER);
+	if(now - last_check >= SLACK_TIME_WINDOW){
+		last_check = now;
+		for(int i=0; i<MAX_LOCAL_TASKS; i++){
+
+			task = &scheduling[i];
+
+			//Check deadline miss
+			if (task->deadline != -1 && task->waiting_msg == 0 && task->remaining_exec_time > task->slack_time /* task->slack_time == 0 && task->remaining_exec_time > (task->execution_time/10) */){
+				puts("#### -------->>>  Deadline miss\n");
+				send_deadline_miss_report(task);
+			}
 		}
 	}
 }

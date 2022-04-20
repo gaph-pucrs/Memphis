@@ -93,6 +93,7 @@ void page_released(int cluster_id, int proc_address, int task_ID){
  * \return The selected processor address. -1 if not found
  */
 int diamond_search_initial(int begining_core){
+	int cand_pages = 0;
 
 	int ref_x, ref_y, max_round, hop_count, max_tested_proc;//XY address of the current processor of the task
 	int proc_x, proc_y, proc_count;
@@ -103,9 +104,14 @@ int diamond_search_initial(int begining_core){
 	ref_y = (begining_core & 0xFF);
 
 	//Return the own beggining core if it is free
-	if(get_proc_free_pages(begining_core)){
+	if(get_proc_free_pages(begining_core) > cand_pages){
+		cand_pages = get_proc_free_pages(begining_core);
+		//if (free_core_map[proc_x][proc_y] == 1){
+		candidate_proc = begining_core;
+
 		//puts("Mapped at beggining core\n");
-		return begining_core;
+		if(cand_pages == MAX_LOCAL_TASKS)
+			return candidate_proc;
 	}
 
 	//puts("xi: "); puts(itoh(cluster_x_offset));
@@ -152,11 +158,13 @@ int diamond_search_initial(int begining_core){
 				proc_count++;
 
 				//Tests if the processor is available, if yes, mark it as used in free_core_map and return
-				if(get_proc_free_pages(test_proc)){
+				if(get_proc_free_pages(test_proc) > cand_pages){
+					cand_pages = get_proc_free_pages(test_proc);
 				//if (free_core_map[proc_x][proc_y] == 1){
 					candidate_proc = test_proc;
 					//puts("Proc selected: "); puts(itoh(candidate_proc)); puts("\n");
-					return candidate_proc;
+					if(cand_pages == MAX_LOCAL_TASKS)
+						return candidate_proc;
 				}
 
 			}

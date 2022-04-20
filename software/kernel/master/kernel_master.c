@@ -306,6 +306,7 @@ void handle_app_terminated(int appID, unsigned int app_task_number, unsigned int
 
 	//putsv("\n --- > Handle APP terminated- app ID: ", appID);
 	//puts("original master addrr "); puts(itoh(app_master_addr)); puts("\n");
+	putsvsv("App terminated with id ", appID, " at time ", MemoryRead(TICK_COUNTER));
 
 	original_cluster = get_cluster_ID(app_master_addr >> 8, app_master_addr & 0xFF);
 
@@ -330,11 +331,34 @@ void handle_app_terminated(int appID, unsigned int app_task_number, unsigned int
 
 	//puts("\n-------\n");
 
-	/*if (terminated_app_count == APP_NUMBER){
-		puts("FINISH ");puts(itoa(MemoryRead(TICK_COUNTER))); puts("\n");
-		MemoryWrite(END_SIM,1);
-	}*/
+	// if (terminated_app_count == APP_NUMBER){
+	// 	puts("FINISH ");puts(itoa(MemoryRead(TICK_COUNTER))); puts("\n");
+	// 	MemoryWrite(END_SIM,1);
+	// }
 
+}
+
+void handle_deadline_miss_report(unsigned taskid)
+{
+	unsigned app_id = taskid >> 8;
+	Application *app = get_application_ptr(app_id);
+	Task *task = get_task_ptr(app, taskid);
+	if(task->status != MIGRATING){
+		task->missed_deadlines++;
+		if(task->missed_deadlines == 3){
+			putsvsv("#### -------->>>  Requesting migration at time ", MemoryRead(TICK_COUNTER), " for task ", task->id);
+			task->missed_deadlines = 0;
+
+			/* Call mapping heuristic */
+			int migrated_pe = diamond_search_initial(app->tasks[0].allocated_proc);
+
+			
+			if(task->allocated_proc != migrated_pe)
+				send_task_migration(taskid, migrated_pe);
+			else
+				puts("Not migrating. Task in the same PE as destination.");
+		}
+	}
 }
 
 /** Handles a new packet from NoC
@@ -349,7 +373,18 @@ void handle_packet() {
 	read_packet((ServiceHeader *)&p);
 
 	switch (p.service){
+	// case MIGRATION_REQUEST:
+	// 	
 
+	// 	if(p.task_ID == 0 || p.task_ID == 2 || p.task_ID == 3){
+	// 		send_task_migration(p.task_ID, 0x0200);
+	// 	} else if(p.task_ID == 1){
+	// 		send_task_migration(p.task_ID, 0x0201);
+	// 	}
+	// 	break;
+	case DEADLINE_MISS_REPORT:
+		handle_deadline_miss_report(p.task_ID);
+		break;
 	case NEW_APP:
 
 		handle_new_app(p.app_ID, 0, p.app_descriptor_size);
@@ -368,7 +403,7 @@ void handle_packet() {
 		//putsv("Allocated tasks: ", allocated_tasks);
 
 		if (allocated_tasks == app->tasks_number){
-
+			putsv("Sending task release at time ", MemoryRead(TICK_COUNTER));
 			send_task_release(app);
 		}
 
@@ -480,7 +515,7 @@ void handle_packet() {
 
 	case TASK_MIGRATED:
 
-		putsvsv("Received task migrated - task id: ", p.task_ID, " new proc ", p.source_PE);
+		putsvsv("Received task migrated - task id: ", p.task_ID, " at time ", MemoryRead(TICK_COUNTER));
 
 		set_task_migrated(p.task_ID, p.source_PE);
 

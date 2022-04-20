@@ -59,6 +59,7 @@ typedef struct {
 	int  borrowed_master;			//!< Stores the borrowed master address
 	int  status;					//!< Stores the status
 	int  dependences_number;		//!< Stores number of communicating task, i.e, dependences
+	int missed_deadlines;
 	Dependence dependences[10];		//!< Stores task dependence array with a size equal to MAX_TASK_DEPENDECES
 } Task;
 

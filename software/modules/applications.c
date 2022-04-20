@@ -201,6 +201,7 @@ Application * read_and_create_application(unsigned int app_id, volatile unsigned
 		tp->computation_load = 0;
 		tp->id = app_id << 8 | task_id;
 		tp->borrowed_master = -1;
+		tp->missed_deadlines = 0;
 
 		putsv("Creating task: ", tp->id);
 		putsv("	code_size: ", tp->code_size);
