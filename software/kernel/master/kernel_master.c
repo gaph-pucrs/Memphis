@@ -338,12 +338,13 @@ void handle_app_terminated(int appID, unsigned int app_task_number, unsigned int
 
 }
 
-void handle_deadline_miss_report(unsigned taskid)
+void handle_deadline_miss_report(unsigned taskid, unsigned slack, unsigned remaining, unsigned waiting)
 {
 	unsigned app_id = taskid >> 8;
 	Application *app = get_application_ptr(app_id);
 	Task *task = get_task_ptr(app, taskid);
-	if(task->status != MIGRATING){
+	
+	if(task->status != MIGRATING && remaining >= slack && waiting == 0){
 		task->missed_deadlines++;
 		if(task->missed_deadlines == 3){
 			putsvsv("#### -------->>>  Requesting migration at time ", MemoryRead(TICK_COUNTER), " for task ", task->id);
@@ -383,7 +384,7 @@ void handle_packet() {
 	// 	}
 	// 	break;
 	case DEADLINE_MISS_REPORT:
-		handle_deadline_miss_report(p.task_ID);
+		handle_deadline_miss_report(p.task_ID, p.cpu_slack_time, p.execution_time, p.utilization);
 		break;
 	case NEW_APP:
 

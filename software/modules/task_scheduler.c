@@ -46,6 +46,10 @@ void send_deadline_miss_report(Scheduling * real_time_task){
 
 	p->task_ID = tcb_ptr->id;
 
+	p->cpu_slack_time = real_time_task->slack_time;
+	p->execution_time = real_time_task->remaining_exec_time;
+	p->utilization = real_time_task->waiting_msg;
+
 	send_packet(p, 0, 0);
 }
 
@@ -308,17 +312,23 @@ void update_real_time(unsigned int current_time){
 	}
 
 	static unsigned last_check = 0;
+	static unsigned last_rt[MAX_LOCAL_TASKS];
 	unsigned now = MemoryRead(TICK_COUNTER);
-	if(now - last_check >= SLACK_TIME_WINDOW){
-		last_check = now;
-		for(int i=0; i<MAX_LOCAL_TASKS; i++){
 
-			task = &scheduling[i];
+	for(int i=0; i<MAX_LOCAL_TASKS; i++){
 
-			//Check deadline miss
-			if (task->deadline != -1 && task->waiting_msg == 0 && task->remaining_exec_time > task->slack_time /* task->slack_time == 0 && task->remaining_exec_time > (task->execution_time/10) */){
+		task = &scheduling[i];
+
+		if(task->tcb_ptr == 0 || task->deadline == -1 || ((TCB*)task->tcb_ptr)->proc_to_migrate != -1)
+			continue; /* Don't send non-RT tasks or non-existent tasks or tasks marked to migrate */
+
+		//Check deadline miss
+		if (now - last_rt[i] >= SLACK_TIME_WINDOW){			
+			if(!MemoryRead(DMNI_SEND_ACTIVE)){
+				/* Avoid flooding DMNI and hanging too much time in LLM */
 				puts("#### -------->>>  Deadline miss\n");
 				send_deadline_miss_report(task);
+				last_rt[i] = now;
 			}
 		}
 	}
