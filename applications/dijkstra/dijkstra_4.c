@@ -1,5 +1,6 @@
 #include <api.h>
 #include <stdlib.h>
+#include "dijkstra.h"
 //#include <stdio.h>
 
 #define NONE                       9999		//Maximum
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
 	Message msg;
 	int rank = 4;
 
-	//RealTime(200000, 200000, 90000, 0); //RealTime(200000, 200000, 90000, 0); - 45% nos primeiros 2s
+	RealTime(DEADLINE, DEADLINE, EXEC_TIME); //RealTime(200000, 200000, 90000, 0); - 45% nos primeiros 2s
 
 	qtdEnvios = 0;
 
@@ -137,7 +138,7 @@ void dijkstra(int myID) {
 	Echo(itoa(tasks[myID][1]));
 	Echo("fim ");
 
-	//RealTime(103349, 103349, 11822, 0);
+	RealTime(43200, 43200, 11822);
 
 
 	for(x=tasks[myID][0]; x<tasks[myID][1]; x++){

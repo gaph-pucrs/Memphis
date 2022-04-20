@@ -1,6 +1,7 @@
 #include <api.h>
 #include <stdlib.h>
 //#include <stdio.h>
+#include "dijkstra.h"
 
 #define NONE                       9999		//Maximum
 #define MAXPROCESSORS			   64		//The amount of processor
@@ -38,7 +39,7 @@ int main(int argc, char *argv[])
 	int i, j;
 	Message msg;
 
-	//RealTime(200000, 200000, 90000, 0);
+	RealTime(DEADLINE, DEADLINE, EXEC_TIME);
 
 	int rank = 1;
 	qtdEnvios = 0;
@@ -124,7 +125,7 @@ void dijkstra(int myID) {
 	int chStart, chEnd;
 	int u =-1;
 
-	//RealTime(103349, 103349, 11750, 0); //RealTime(103349, 103349, 11650) = 10% utilization
+	RealTime(43200, 43200, 11750); //RealTime(103349, 103349, 11650) = 10% utilization
 
 	for(x=tasks[myID][0]; x<tasks[myID][1]; x++){
 		chStart = nodes_tasks[x][0];	//Start node

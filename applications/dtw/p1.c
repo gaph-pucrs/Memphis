@@ -15,6 +15,8 @@ int main(){
 
 	__builtin_memcpy(test, msg.msg, sizeof(test));
 
+	RealTime(DEADLINE, DEADLINE, EXEC_TIME);
+
 	for(j=0; j<PATTERN_PER_TASK; j++){
 
 		Echo("Task P1 FOR\n");
@@ -34,6 +36,8 @@ int main(){
 		msg.msg[0] = result;
 
 		Send(&msg, recognizer);
+
+		Echo("1");
 	}
 
 	Echo("Task P1 FINISHEDD IN\n");

@@ -104,7 +104,7 @@ int main () {
 
 	Echo("FIR - start");
 
-	//RealTime(AUDIO_VIDEO_PERIOD, FIR_deadline, FIR_exe_time);
+	RealTime(AUDIO_VIDEO_PERIOD, FIR_deadline, FIR_exe_time);
 
 	for(k=0; k<FRAMES; k++ ) {
 

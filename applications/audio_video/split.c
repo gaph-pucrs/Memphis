@@ -48,7 +48,7 @@ int main() {
 		msg1.msg[i] = vlc_array[i];
 	msg1.length = 128;
 
-	//RealTime(AUDIO_VIDEO_PERIOD, SPLIT_deadline, SPLIT_exe_time);
+	RealTime(AUDIO_VIDEO_PERIOD, SPLIT_deadline, SPLIT_exe_time);
 
 	for (i = 0; i < FRAMES; i++) {
 

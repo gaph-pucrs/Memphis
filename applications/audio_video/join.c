@@ -14,7 +14,7 @@ int main() {
     Echo("Number of frames");
 	Echo(itoa(FRAMES));
 
-	//RealTime(AUDIO_VIDEO_PERIOD, JOIN_deadline, JOIN_exe_time);
+	RealTime(AUDIO_VIDEO_PERIOD, JOIN_deadline, JOIN_exe_time);
 
 	j = 0;
 	for(k=0; k<FRAMES; k++ ) {

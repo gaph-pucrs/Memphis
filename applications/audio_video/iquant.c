@@ -82,7 +82,7 @@ int main() {
 
 	Echo("Task IQUANT start:");
 
-	//RealTime(AUDIO_VIDEO_PERIOD, IQUANT_deadline, IQUANT_exe_time);
+	RealTime(AUDIO_VIDEO_PERIOD, IQUANT_deadline, IQUANT_exe_time);
 
 	for (j = 0; j < FRAMES; j++) {
 

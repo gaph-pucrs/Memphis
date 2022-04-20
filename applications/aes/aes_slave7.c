@@ -30,6 +30,8 @@ int main()
 	Echo(itoa(GetTick()));
     Echo("task AES SLAVE started - ID:"); 
 	aes_key_setup(&key[0][0], key_schedule, 256);    
+
+	RealTime(DEADLINE, DEADLINE, EXEC_TIME);
     
     while(flag){
 		Receive(&msg, aes_master);
